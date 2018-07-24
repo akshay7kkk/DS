@@ -1,0 +1,133 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <ctype.h>
+//#include "infixtopostfix.h"
+
+
+struct node
+{
+	int data;
+	struct node* llink;
+	struct node* rlink;
+};
+typedef struct node* NODE;
+
+
+NODE getnode()
+{
+	NODE x;
+	x = malloc(sizeof(struct node));
+
+	return x;
+}
+
+NODE create(char postfix[])
+{
+
+	int i,k;
+	NODE temp;
+
+	char symbol;
+	NODE stack[100];
+
+
+	for(i=k=0; (symbol = postfix[i]) != '\0'; i++)
+	{
+		temp = getnode();
+
+		temp->data = symbol;
+		temp->llink = temp->rlink = NULL;
+
+		if(isalnum(symbol))
+		{
+			stack[k++] = temp;
+
+		}
+
+		else
+		{
+			temp->rlink = stack[--k];
+			temp->llink = stack[--k];
+
+			stack[k++] = temp;
+		}
+
+	}
+
+	return stack[--k];
+
+}
+
+float evaluate(NODE root)
+{
+	float num;
+
+	switch(root->data)
+	{
+		case '+' : return evaluate(root->llink) + evaluate(root->rlink);
+		case '-' : return evaluate(root->llink) - evaluate(root->rlink);
+		case '*' : return evaluate(root->llink) * evaluate(root->rlink);
+		case '/' : return evaluate(root->llink) / evaluate(root->rlink);
+		case'^':
+		case'$':
+			return pow(evaluate(root->llink),evaluate(root->rlink));
+
+		default: 
+				if(isalpha(root->data))
+				{
+					printf("%c = \n", root->data);
+					scanf("%f",&num);
+					return num;
+				}
+
+				else
+					return root->data - '0';
+	}
+
+
+}
+
+void display(NODE root,int i)
+{
+	int j;
+	if(root==NULL)return;
+	display(root->rlink,i+1);
+	for(j=0;j<i;j++)
+		printf("	");
+	printf("%c	",root->data);
+	printf("\n");
+		
+	display(root->llink,i+1);
+}
+
+
+int main()
+{
+	char postfix[100], infix[100];
+	float res = 0;
+	NODE root;
+	root = NULL;
+/*********************************************
+TODO: 		1. SAVE THE INFIX TO POSTFIX PROGRAM IN THE SAME FOLDER with a dot h(.h) extension.
+		2. UNCOMMENT THE CODE BELOW.
+		3. DELETE LINES 121 AND 122.
+		4. UNCOMMENT THE HEADER FILE.
+**********************************************/
+	// printf("Enter the infix expression: \n");
+	// scanf("%s",infix);
+	// infix_to_postfix(infix,postfix);
+
+	printf("Enter a valid postfix expression: \n");
+	scanf("%s",postfix);
+
+
+	root = create(postfix);
+	res = evaluate(root);
+	printf("The created tree is : \n");
+	display(root, 1);
+	printf("Result : %f \n",res);
+
+	return 0;
+
+}
